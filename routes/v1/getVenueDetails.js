@@ -6,7 +6,7 @@ require('dotenv').config(); // Load environment variables from .env file
 const TICKETMASTER_API_KEY = process.env.TICKETMASTER_API_KEY;
 
 router.get('/', async (req, res) => {
-    const { venue } = req.query;
+    const { keyword } = req.query;
     const ticketmasterVenueDetailsUrl = 'https://app.ticketmaster.com/discovery/v2/venues';
 
     try {
@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
         const venueDetailsResponse = await axios.get(ticketmasterVenueDetailsUrl, {
             params: {
                 apikey: TICKETMASTER_API_KEY,
-                keyword: venue,
+                keyword: keyword,
             }
         });
 
