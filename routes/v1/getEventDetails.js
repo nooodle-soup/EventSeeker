@@ -36,6 +36,8 @@ router.get('/', async (req, res) => {
                 ticketStatus: eventData.dates.status.code || '',
                 buyTicketUrl: eventData.url || '',
                 seatmapUrl: eventData.seatmap?.staticUrl || '',
+                id: eventData.id,
+                icon: eventData.images.find(image => image.height === 56)?.url || '',
             };
 
             // Search for artist on Spotify and get album details

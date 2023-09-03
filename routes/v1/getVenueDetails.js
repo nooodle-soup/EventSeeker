@@ -7,25 +7,47 @@ const TICKETMASTER_API_KEY = process.env.TICKETMASTER_API_KEY;
 
 router.get('/', async (req, res) => {
     const { venue } = req.query;
-    const ticketmasterVenueDetailsUrl = `https://app.ticketmaster.com/discovery/v2/venues?`;
+    const ticketmasterVenueDetailsUrl = 'https://app.ticketmaster.com/discovery/v2/venues';
 
     try {
-        // Construct the URL for the Ticketmaster Venue Details API request
-        const ticketmasterRequestLink = ticketmasterVenueDetailsUrl + new URLSearchParams({
-            apikey: TICKETMASTER_API_KEY,
-            keyword: venue,
-        });
-
         // Send request to Ticketmaster API for venue details
-        const venueDetailsResponse = await axios.get(ticketmasterRequestLink);
+        const venueDetailsResponse = await axios.get(ticketmasterVenueDetailsUrl, {
+            params: {
+                apikey: TICKETMASTER_API_KEY,
+                keyword: venue,
+            }
+        });
 
         // Check if the response status is 200 (OK)
         if (venueDetailsResponse.status === 200) {
-            // Send the venue details as JSON response
-            res.status(200).json({
-                status: 'success',
-                venueDetails: venueDetailsResponse.data, // Sending the actual data
-            });
+            // Extract the details of the first venue in the list
+            const firstVenue = venueDetailsResponse.data._embedded.venues[0];
+
+            if (firstVenue) {
+                // Extract the specific fields from the first venue
+                const venueDetails = {
+                    name: firstVenue.name,
+                    addressLine1: firstVenue.address.line1,
+                    cityName: firstVenue.city.name,
+                    stateName: firstVenue.state.name,
+                    boxOfficeOpenHours: firstVenue.boxOfficeInfo?.openHours || '',
+                    boxOfficePhoneNumber: firstVenue.boxOfficeInfo?.phoneNumber || '',
+                    generalRule: firstVenue.generalInfo?.generalRule || '',
+                    childRule: firstVenue.generalInfo?.childRule || '',
+                };
+
+                // Send the extracted venue details as JSON response
+                res.status(200).json({
+                    status: 'success',
+                    venueDetails: venueDetails,
+                });
+            } else {
+                // If no venues found, send an empty response
+                res.status(200).json({
+                    status: 'success',
+                    venueDetails: null,
+                });
+            }
         } else {
             // If the response status is not 200, handle the error
             res.status(500).json({
@@ -42,3 +64,4 @@ router.get('/', async (req, res) => {
 });
 
 module.exports = router;
+
