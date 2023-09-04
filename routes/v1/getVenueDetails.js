@@ -34,6 +34,7 @@ router.get('/', async (req, res) => {
                     boxOfficePhoneNumber: firstVenue.boxOfficeInfo?.phoneNumber || '',
                     generalRule: firstVenue.generalInfo?.generalRule || '',
                     childRule: firstVenue.generalInfo?.childRule || '',
+                    location: firstVenue.location
                 };
 
                 // Send the extracted venue details as JSON response
